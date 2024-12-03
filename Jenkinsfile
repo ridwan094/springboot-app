@@ -20,7 +20,7 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:19.03.12-dind'  // Docker-in-Docker image
+                    image 'docker:27.4.0-rc.2-dind-rootless'  // Docker-in-Docker image
                     args '--privileged -v /var/jenkins_home:/var/jenkins_home'  // Menambahkan --privileged untuk DinD dan volume Jenkins
                 }
             }
