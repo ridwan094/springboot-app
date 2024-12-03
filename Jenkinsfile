@@ -1,8 +1,9 @@
 pipeline {
-    agent any
-    environment {
-        MAVEN_HOME = '/usr/share/maven'
-        PATH = "${MAVEN_HOME}/bin:${env.PATH}"
+    agent {
+        docker {
+            image 'maven:3.8.6-openjdk-11'  // Menggunakan Docker image dengan Maven dan OpenJDK 11
+            args '-v /var/jenkins_home:/var/jenkins_home'  // Agar volume Jenkins bisa digunakan di container
+        }
     }
     stages {
         stage('Checkout') {
