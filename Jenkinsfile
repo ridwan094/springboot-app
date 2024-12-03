@@ -14,14 +14,15 @@ pipeline {
         stage('Build JAR') {
             steps {
                 script {
-
-                    sh './mvnw clean package'
+                    echo 'Building JAR...'
+                    sh 'mvn clean package'
                 }
             }
         }
         stage('Build Docker Image') {
             steps {
                 script {
+                    echo 'Building Docker Image...'
                     sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
                 }
             }
@@ -36,7 +37,7 @@ pipeline {
     }
     post {
         always {
-            cleanWs()  // Membersihkan workspace Jenkins setelah proses selesai
+            cleanWs()
         }
     }
 }
