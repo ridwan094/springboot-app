@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.6-openjdk-11'  // Menggunakan Docker image dengan Maven dan OpenJDK 11
-            args '-v /var/jenkins_home:/var/jenkins_home'  // Agar volume Jenkins bisa digunakan di container
-        }
-    }
+    agent any
     stages {
         stage('Checkout') {
             steps {
@@ -12,6 +7,12 @@ pipeline {
             }
         }
         stage('Build with Maven') {
+            agent {
+                docker {
+                    image 'maven:3.8.6-openjdk-11'  // Menggunakan image Docker dengan Maven dan OpenJDK 11
+                    args '-v /var/jenkins_home:/var/jenkins_home'  // Agar volume Jenkins bisa digunakan di container
+                }
+            }
             steps {
                 sh 'mvn clean install'
             }
