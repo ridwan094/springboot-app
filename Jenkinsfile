@@ -1,58 +1,41 @@
 pipeline {
     agent any
-
     environment {
-        JAVA_HOME = '/usr/lib/jvm/java-11-openjdk-amd64'
-        MAVEN_HOME = '/usr/share/maven'
+        DOCKER_IMAGE = 'springboot-hello-world'
+        DOCKER_TAG = 'latest'
     }
-
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
                 git 'https://github.com/ridwan094/springboot-app.git'
             }
         }
-
-        stage('Build') {
+        stage('Build JAR') {
             steps {
                 script {
-                    sh '${MAVEN_HOME}/bin/mvn clean install -DskipTests'
+                    sh './mvnw clean package'
                 }
             }
         }
-
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
                 script {
-                    sh '${MAVEN_HOME}/bin/mvn test'
+                    sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
                 }
             }
         }
-
-        stage('Package') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    sh '${MAVEN_HOME}/bin/mvn package'
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    sh 'docker build -t springboot-app .'
-                    sh 'docker run -d -p 8080:8080 springboot-app'
+                    sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
                 }
             }
         }
     }
-
     post {
-        success {
-            echo 'Build and Deploy successful!'
-        }
-        failure {
-            echo 'Build or Deploy failed. Please check the logs!'
+        always {
+            cleanWs()
         }
     }
 }
+
