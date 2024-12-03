@@ -3,7 +3,6 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'springboot-hello-world'
         DOCKER_TAG = 'latest'
-        DOCKER_CREDENTIALS = 'rainover922'
     }
     stages {
         stage('Checkout') {
@@ -11,10 +10,19 @@ pipeline {
                 git 'https://github.com/ridwan094/springboot-app.git'
             }
         }
+        stage('Check Maven Version') {
+            steps {
+                script {
+                    // Mengecek apakah Maven terinstal dan versi yang digunakan
+                    sh 'mvn -v'
+                    sh 'java -version'
+                }
+            }
+        }
         stage('Build JAR') {
             steps {
                 script {
-                    echo 'Building JAR...'
+                    // Menjalankan build menggunakan Maven
                     sh 'mvn clean package'
                 }
             }
@@ -22,7 +30,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo 'Building Docker Image...'
                     sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
                 }
             }
@@ -30,6 +37,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
+                    // Pastikan Docker login sudah dilakukan sebelumnya
                     sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
                 }
             }
@@ -37,9 +45,8 @@ pipeline {
     }
     post {
         always {
-            cleanWs()
+            cleanWs()  // Membersihkan workspace Jenkins setelah proses selesai
         }
     }
 }
-
 
