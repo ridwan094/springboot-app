@@ -18,16 +18,34 @@ pipeline {
             }
         }
         stage('Build Docker Image') {
+            agent {
+                docker {
+                    image 'docker:19.03.12-dind'  // Docker-in-Docker image
+                    args '--privileged -v /var/jenkins_home:/var/jenkins_home'  // Menambahkan --privileged untuk DinD dan volume Jenkins
+                }
+            }
             steps {
                 sh 'docker build -t springboot-app .'
             }
         }
         stage('Push Docker Image') {
+            agent {
+                docker {
+                    image 'docker:19.03.12-dind'  // Docker-in-Docker image
+                    args '--privileged -v /var/jenkins_home:/var/jenkins_home'  // Menambahkan --privileged untuk DinD dan volume Jenkins
+                }
+            }
             steps {
                 sh 'docker push springboot-app'
             }
         }
         stage('Run Application') {
+            agent {
+                docker {
+                    image 'docker:19.03.12-dind'  // Docker-in-Docker image
+                    args '--privileged -v /var/jenkins_home:/var/jenkins_home'  // Menambahkan --privileged untuk DinD dan volume Jenkins
+                }
+            }
             steps {
                 sh 'docker run -d -p 8080:8080 springboot-app'
             }
