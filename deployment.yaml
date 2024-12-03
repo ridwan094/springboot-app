@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-hello-world
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-hello-world
+  template:
+    metadata:
+      labels:
+        app: springboot-hello-world
+    spec:
+      containers:
+      - name: springboot-hello-world
+        image: rainover922/springboot-hello-world:latest
+        ports:
+        - containerPort: 8080
