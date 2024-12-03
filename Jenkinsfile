@@ -3,6 +3,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'springboot-hello-world'
         DOCKER_TAG = 'latest'
+        DOCKER_CREDENTIALS = 'rainover922'
     }
     stages {
         stage('Checkout') {
@@ -13,7 +14,7 @@ pipeline {
         stage('Build JAR') {
             steps {
                 script {
-                    
+
                     sh './mvnw clean package'
                 }
             }
@@ -28,7 +29,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'  // Pastikan Docker login sudah dilakukan
+                    sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
                 }
             }
         }
@@ -39,4 +40,5 @@ pipeline {
         }
     }
 }
+
 
