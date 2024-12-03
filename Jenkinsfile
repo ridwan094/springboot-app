@@ -5,7 +5,7 @@ pipeline {
         DOCKER_TAG = 'latest'
     }
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
                 git 'https://github.com/ridwan094/springboot-app.git'
             }
@@ -13,6 +13,7 @@ pipeline {
         stage('Build JAR') {
             steps {
                 script {
+                    
                     sh './mvnw clean package'
                 }
             }
@@ -27,14 +28,14 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
+                    sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'  // Pastikan Docker login sudah dilakukan
                 }
             }
         }
     }
     post {
         always {
-            cleanWs()
+            cleanWs()  // Membersihkan workspace Jenkins setelah proses selesai
         }
     }
 }
