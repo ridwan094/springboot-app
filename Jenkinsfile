@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_HOST = 'tcp://localhost:2375'  // Mengatur DOCKER_HOST jika perlu (ini diperlukan untuk DinD)
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -9,7 +12,7 @@ pipeline {
         stage('Build with Maven') {
             agent {
                 docker {
-                    image 'maven:3.8.6-openjdk-11'  // Menggunakan image Docker dengan Maven dan OpenJDK 11
+                    image 'maven:3.8.6-openjdk-11'  // Menggunakan image Maven dengan JDK 11
                     args '-v /var/jenkins_home:/var/jenkins_home'  // Agar volume Jenkins bisa digunakan di container
                 }
             }
@@ -20,8 +23,8 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:27.4.0-rc.2-dind-rootless'  // Docker-in-Docker image
-                    args '--privileged -v /var/jenkins_home:/var/jenkins_home'  // Menambahkan --privileged untuk DinD dan volume Jenkins
+                    image 'docker:20.10'  // Menggunakan Docker image yang menyediakan Docker
+                    args '-v /var/jenkins_home:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
                 }
             }
             steps {
@@ -29,23 +32,11 @@ pipeline {
             }
         }
         stage('Push Docker Image') {
-            agent {
-                docker {
-                    image 'docker:19.03.12-dind'  // Docker-in-Docker image
-                    args '--privileged -v /var/jenkins_home:/var/jenkins_home'  // Menambahkan --privileged untuk DinD dan volume Jenkins
-                }
-            }
             steps {
                 sh 'docker push springboot-app'
             }
         }
         stage('Run Application') {
-            agent {
-                docker {
-                    image 'docker:19.03.12-dind'  // Docker-in-Docker image
-                    args '--privileged -v /var/jenkins_home:/var/jenkins_home'  // Menambahkan --privileged untuk DinD dan volume Jenkins
-                }
-            }
             steps {
                 sh 'docker run -d -p 8080:8080 springboot-app'
             }
